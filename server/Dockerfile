@@ -26,6 +26,8 @@ WORKDIR /dist
 # Copy binary from build to main folder
 RUN cp /build/main .
 
+COPY .env .
+
 # # Export necessary port
 EXPOSE 3000
 
