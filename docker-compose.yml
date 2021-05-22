@@ -3,6 +3,8 @@ version: "3"
 services:
   server:
     restart: always
+    env_file:
+      - ./server/.env
     build: ./server
     image: server
     ports: 
