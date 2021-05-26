@@ -54,7 +54,10 @@ func GetUserByID(id string, c *gin.Context, ctx context.Context) {
 		core.Error(c, "No user fonded!", err)
 		return
 	}
-	core.Success(c, gin.H{"user": user})
+
+	core.Success(c, gin.H{
+		"user": user,
+	})
 }
 
 func ListUsers(c *gin.Context) {
