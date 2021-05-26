@@ -1,6 +1,9 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/ogustavobelo/simple-crud-go/core"
+)
 
 func InitRoutes(router *gin.Engine) {
 	//Tests
@@ -8,8 +11,11 @@ func InitRoutes(router *gin.Engine) {
 	router.GET("/pong", Pong)
 
 	//Users Routes
-	router.POST("/users/create", CreateUser)
-	router.GET("/users", ListUsers)
-	router.PUT("/users/update", UpdateUser)
-	router.DELETE("/users/delete-all", DeleteAll)
+	router.POST("/users", CreateUser)
+	users := router.Group("users", core.Auth())
+	{
+		users.GET("/", ListUsers)
+		users.PUT("/", UpdateUser)
+		users.DELETE("/delete-all", DeleteAll)
+	}
 }
