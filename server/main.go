@@ -9,7 +9,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/ogustavobelo/simple-crud-go/controllers"
 	"github.com/ogustavobelo/simple-crud-go/core"
 	"github.com/ogustavobelo/simple-crud-go/services"
@@ -26,8 +25,12 @@ func init() {
 }
 
 func main() {
-	router := gin.Default()
-	controllers.InitRoutes(router)
+	// router := gin.Default()
+	// controllers.InitRoutes(router)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello Secure World")
+	})
 
 	certManager := autocert.Manager{
 		Prompt: autocert.AcceptTOS,
@@ -36,16 +39,18 @@ func main() {
 
 	server := &http.Server{
 		Addr:    ":443",
-		Handler: router,
+		Handler: mux,
 		TLSConfig: &tls.Config{
 			GetCertificate: certManager.GetCertificate,
 		},
 	}
 
-	port := ":" + os.Getenv("SERVER_PORT")
-	fmt.Println("Starting server on port: ", port)
-	go http.ListenAndServe(port, certManager.HTTPHandler(nil))
-	log.Fatal(server.ListenAndServeTLS("", ""))
+	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	server.ListenAndServeTLS("", "")
+	// port := ":" + os.Getenv("SERVER_PORT")
+	// fmt.Println("Starting server on port: ", port)
+	// go http.ListenAndServe(port, certManager.HTTPHandler(nil))
+	// log.Fatal(server.ListenAndServeTLS("", ""))
 	// log.Fatal(router.Run(port))
 	// log.Fatal(autotls.Run(router, "ogustavobelo.com", "localhost"))
 }
