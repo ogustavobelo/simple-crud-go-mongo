@@ -29,7 +29,10 @@ RUN cp /build/main .
 COPY .env .
 
 # # Export necessary port
+EXPOSE 443
 EXPOSE 3000
+
+VOLUME ["/certs"]
 
 # Command to run when starting the container
 CMD ["/dist/main"]

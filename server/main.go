@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -13,9 +15,12 @@ import (
 	"github.com/ogustavobelo/simple-crud-go/services"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func init() {
+	fmt.Printf("on init ")
+
 	services.EnvCheck()
 	connectDB()
 }
@@ -24,11 +29,32 @@ func main() {
 	router := gin.Default()
 	controllers.InitRoutes(router)
 
+	certManager := autocert.Manager{
+		Prompt: autocert.AcceptTOS,
+		Cache:  autocert.DirCache("certs"),
+	}
+
+	server := &http.Server{
+		Addr:    ":443",
+		Handler: router,
+		TLSConfig: &tls.Config{
+			GetCertificate: certManager.GetCertificate,
+		},
+	}
+
 	port := ":" + os.Getenv("SERVER_PORT")
-	fmt.Printf("Starting server on port %v...", port)
-	log.Fatal(router.Run(port))
+	fmt.Println("Starting server on port: ", port)
+	go http.ListenAndServe(port, certManager.HTTPHandler(nil))
+	log.Fatal(server.ListenAndServeTLS("", ""))
+	// log.Fatal(router.Run(port))
 	// log.Fatal(autotls.Run(router, "ogustavobelo.com", "localhost"))
 }
+
+// func redirect(w http.ResponseWriter, req *http.Request) {
+// 	target := "https://" + req.Host + req.RequestURI
+
+// 	http.Redirect(w, req, target, http.StatusMovedPermanently)
+// }
 
 func connectDB() {
 	databasePort := os.Getenv("DATABASE_PORT")
