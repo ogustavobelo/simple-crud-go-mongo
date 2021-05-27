@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -33,20 +32,19 @@ func main() {
 	})
 
 	certManager := autocert.Manager{
-		Prompt: autocert.AcceptTOS,
-		Cache:  autocert.DirCache("certs"),
+		Prompt:     autocert.AcceptTOS,
+		Cache:      autocert.DirCache("certs"),
+		HostPolicy: autocert.HostWhitelist("ogustavobelo.com", "www.ogustavobelo.com"),
 	}
 
 	server := &http.Server{
-		Addr:    ":443",
-		Handler: mux,
-		TLSConfig: &tls.Config{
-			GetCertificate: certManager.GetCertificate,
-		},
+		Addr:      ":https",
+		Handler:   mux,
+		TLSConfig: certManager.TLSConfig(),
 	}
 
-	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
-	server.ListenAndServeTLS("", "")
+	// go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	log.Fatal(server.ListenAndServeTLS("", ""))
 	// port := ":" + os.Getenv("SERVER_PORT")
 	// fmt.Println("Starting server on port: ", port)
 	// go http.ListenAndServe(port, certManager.HTTPHandler(nil))
