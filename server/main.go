@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
 	"github.com/ogustavobelo/simple-crud-go/controllers"
 	"github.com/ogustavobelo/simple-crud-go/core"
@@ -26,7 +27,8 @@ func main() {
 
 	port := ":" + os.Getenv("SERVER_PORT")
 	fmt.Printf("Starting server on port %v...", port)
-	log.Fatal(router.Run(port))
+	// log.Fatal(router.Run(port))
+	log.Fatal(autotls.Run(router, "ogustavobelo.com", "localhost"))
 }
 
 func connectDB() {
