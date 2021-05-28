@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/caddyserver/certmagic"
 	"github.com/gin-gonic/gin"
 	"github.com/ogustavobelo/simple-crud-go/controllers"
 	"github.com/ogustavobelo/simple-crud-go/core"
@@ -27,8 +26,8 @@ func main() {
 
 	port := ":" + os.Getenv("SERVER_PORT")
 	fmt.Printf("Starting server on port %v...", port)
-	log.Fatal(certmagic.HTTPS([]string{"ogustavobelo.com"}, router))
-	// log.Fatal(router.Run(port))
+	// log.Fatal(certmagic.HTTPS([]string{"ogustavobelo.com"}, router))
+	log.Fatal(router.Run(port))
 }
 
 func connectDB() {

@@ -20,7 +20,11 @@ services:
     restart: unless-stopped
     volumes:
       # - web-root:/var/www/html
+      # - ./nginx-conf:/etc/nginx/conf.d
+      - web-root:/var/www/html
       - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
     ports:
       - "${NGINX_HOST_HTTP_PORT}:80"
       - "${NGINX_HOST_HTTPS_PORT}:443"
@@ -40,16 +44,31 @@ services:
     volumes:
       - mongo-data:/data/db 
   
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/var/www/html --email ogustavobelo@gmail.com --agree-tos --no-eff-email --force-renewal -d ogustavobelo.com
+    
+    
+  
 networks:
   app-network:
     driver: bridge
 
 volumes:
+  certbot-etc:
+  certbot-var:
   mongo-data:
     driver: local
-  # web-root:
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     device: /root/simple-crud-go-mongo/
-  #     o: bind
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /root/simple-crud-go-mongo/
+      o: bind
