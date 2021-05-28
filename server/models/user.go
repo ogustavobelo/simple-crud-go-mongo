@@ -13,6 +13,6 @@ type User struct {
 	Role      string             `bson:"role" json:"role"`
 	ImageURL  string             `bson:"image_url" json:"image_url"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
-	DeletedAt time.Time          `bson:"deleted_at" json:"deleted_at"`
-	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
+	DeletedAt *time.Time         `bson:"deleted_at,omitempty" json:"deleted_at,omitempty"`
+	UpdatedAt *time.Time         `bson:"updated_at,omitempty" json:"updated_at,omitempty"`
 }

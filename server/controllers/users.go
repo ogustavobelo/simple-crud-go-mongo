@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ogustavobelo/simple-crud-go/core"
 	"github.com/ogustavobelo/simple-crud-go/models"
+	"github.com/ogustavobelo/simple-crud-go/services"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,25 +18,38 @@ import (
 var collection *mongo.Collection
 
 func CreateUser(c *gin.Context) {
-	var json models.User
-	if err := c.ShouldBindJSON(&json); err != nil {
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
 		core.Error(c, "Can't create user!", err)
 		return
 	}
-	json.ID = primitive.NewObjectID()
-	json.CreatedAt = time.Now()
+
+	if user.Email == "" {
+		core.Error(c, "Email can't be empty!", nil)
+		return
+	}
+
+	user.ID = primitive.NewObjectID()
+	user.CreatedAt = time.Now()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	result, err := collection.InsertOne(ctx, json)
+	_, err := collection.InsertOne(ctx, user)
 	if err != nil {
 		core.Error(c, "Unable to save user!", err)
 		return
 	}
-	fmt.Println("Result ", result)
+
+	token, err := services.NewJWTService().GenerateToken(user.ID.String())
+	if err != nil {
+		core.UnknownError(c, err)
+		return
+	}
+
 	core.Success(c, gin.H{
 		"message": "user create sucessfully!",
-		"id":      result.InsertedID,
+		"user":    user,
+		"token":   token,
 	})
 }
 
@@ -107,15 +121,20 @@ func UpdateUser(c *gin.Context) {
 		core.Error(c, "Invalid user!", err)
 		return
 	}
+	if user.ID == primitive.NilObjectID {
+		core.Error(c, "User ID Can't be Empty!", nil)
+		return
+	}
+
+	now := time.Now()
+	user.UpdatedAt = &now
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	result := collection.FindOneAndUpdate(ctx,
 		bson.M{"_id": user.ID},
 		bson.M{
-			"$set": bson.M{
-				"name": user.Name,
-			},
+			"$set": user,
 		})
 	err := result.Err()
 	if err != nil {
@@ -123,7 +142,10 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	core.Success(c, gin.H{"message": "user updated"})
+	core.Success(c, gin.H{
+		"message": "user updated succesfully",
+		"user":    user,
+	})
 }
 
 func DeleteAll(c *gin.Context) {
