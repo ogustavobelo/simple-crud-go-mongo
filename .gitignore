@@ -1,2 +1,5 @@
 .data/
 .dhparam/
+dev.sh
+devserver.sh
+docker-compose.dev.yml

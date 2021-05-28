@@ -6,16 +6,19 @@ import (
 )
 
 func InitRoutes(router *gin.Engine) {
-	//Tests
-	router.GET("/ping", Ping)
-	router.GET("/pong", Pong)
-
-	//Users Routes
-	router.POST("/users", CreateUser)
-	users := router.Group("users", core.Auth())
+	main := router.Group("simple-crud")
 	{
-		users.GET("/", ListUsers)
-		users.PUT("/", UpdateUser)
-		users.DELETE("/delete-all", DeleteAll)
+		//Tests
+		main.GET("/ping", Ping)
+		main.GET("/pong", Pong)
+
+		//Users Routes
+		main.POST("/users", CreateUser)
+		users := main.Group("users", core.Auth())
+		{
+			users.GET("/", ListUsers)
+			users.PUT("/", UpdateUser)
+			users.DELETE("/delete-all", DeleteAll)
+		}
 	}
 }
