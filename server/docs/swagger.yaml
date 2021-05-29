@@ -1,0 +1,73 @@
+definitions:
+  models.CreateUserPayload:
+    properties:
+      email:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  models.CreateUserResponse:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      operationId: post-create-user
+      parameters:
+      - description: Create User Payload
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CreateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create an user
+swagger: "2.0"

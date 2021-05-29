@@ -10,6 +10,7 @@ import (
 	"github.com/ogustavobelo/simple-crud-go/core"
 	"github.com/ogustavobelo/simple-crud-go/models"
 	"github.com/ogustavobelo/simple-crud-go/services"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,6 +18,15 @@ import (
 
 var collection *mongo.Collection
 
+// CreateUser godoc
+// @Summary Create an user
+// @ID post-create-user
+// @Accept  json
+// @Produce  json
+// @Param data body models.CreateUserPayload true "Create User Payload"
+// @Success 200 {object} models.CreateUserResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Router /users [post]
 func CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
