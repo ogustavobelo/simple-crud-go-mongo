@@ -1,0 +1,220 @@
+definitions:
+  models.CreateUserPayload:
+    properties:
+      email:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+    type: object
+  models.CreateUserResponse:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.DeleteResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.UpdateUserResponse:
+    properties:
+      message:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /users:
+    delete:
+      consumes:
+      - application/json
+      operationId: delete-all-user
+      parameters:
+      - description: Bearer ...
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DeleteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: ""
+      summary: Delete all users
+    get:
+      consumes:
+      - application/json
+      operationId: list-all-user
+      parameters:
+      - description: Bearer ...
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.UpdateUserResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: ""
+      summary: List all Users
+    post:
+      consumes:
+      - application/json
+      operationId: post-create-user
+      parameters:
+      - description: Create User Payload
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CreateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create an user
+    put:
+      consumes:
+      - application/json
+      operationId: update-user
+      parameters:
+      - description: Update User Payload
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      - description: Bearer ...
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UpdateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: ""
+      summary: Update an user
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      operationId: delete-user
+      parameters:
+      - description: Bearer ...
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: id
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DeleteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: ""
+      summary: Delete an user by ID
+    get:
+      consumes:
+      - application/json
+      operationId: list-user
+      parameters:
+      - description: Bearer ...
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: id
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UpdateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: ""
+      summary: List an user by ID
+swagger: "2.0"

@@ -11,6 +11,7 @@ import (
 	"github.com/ogustavobelo/simple-crud-go/controllers"
 	"github.com/ogustavobelo/simple-crud-go/core"
 	"github.com/ogustavobelo/simple-crud-go/services"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
