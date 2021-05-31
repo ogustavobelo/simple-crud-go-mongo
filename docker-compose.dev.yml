@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+    server:
+        restart: always
+        env_file:
+            - ./server/.env
+        build: ./server
+        image: server
+        ports: 
+            - "3000:3000"
+        depends_on:
+            - mongodb
+        networks:
+            - app-network
+
+    mongodb:
+        restart: always
+        image: "mongo"
+        container_name: 'mongodb'
+        networks:
+        - app-network
+        ports:
+        - "27017:27017"
+        volumes:
+            - mongo-data:/data/db 
+    
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    mongo-data:
+        driver: local

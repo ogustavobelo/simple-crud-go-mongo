@@ -1,5 +1,6 @@
 .data/
 .dhparam/
 dev.sh
+swag.sh
 devserver.sh
-docker-compose.dev.yml
+log-server.sh

@@ -63,9 +63,19 @@ func CreateUser(c *gin.Context) {
 	})
 }
 
+// GetUserByID godoc
+// @Summary List an user by ID
+// @ID list-user
+// @Accept  json
+// @Produce  json
+// @Param Authorization header string true "Bearer ..."
+// @Param q query string false "id"
+// @Success 200 {object} models.UpdateUserResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401
+// @Router /users/{id} [get]
 func GetUserByID(id string, c *gin.Context, ctx context.Context) {
 
-	fmt.Println("Query ID ", id)
 	parsedID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		core.Error(c, "Invalid ID!", err)
@@ -96,6 +106,16 @@ func ListUsers(c *gin.Context) {
 	}
 }
 
+// ListAllUsers godoc
+// @Summary List all Users
+// @ID list-all-user
+// @Accept  json
+// @Produce  json
+// @Param Authorization header string true "Bearer ..."
+// @Success 200 {array} models.UpdateUserResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401
+// @Router /users [get]
 func ListAllUsers(c *gin.Context, ctx context.Context) {
 
 	cur, err := collection.Find(ctx, bson.D{})
@@ -125,6 +145,17 @@ func ListAllUsers(c *gin.Context, ctx context.Context) {
 
 }
 
+// UpdateUser godoc
+// @Summary Update an user
+// @ID update-user
+// @Accept  json
+// @Produce  json
+// @Param data body models.User true "Update User Payload"
+// @Param Authorization header string true "Bearer ..."
+// @Success 200 {object} models.UpdateUserResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401
+// @Router /users [put]
 func UpdateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -158,10 +189,61 @@ func UpdateUser(c *gin.Context) {
 	})
 }
 
+// DeleteAll godoc
+// @Summary Delete all users
+// @ID delete-all-user
+// @Accept  json
+// @Produce  json
+// @Param Authorization header string true "Bearer ..."
+// @Success 200 {object} models.DeleteResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401
+// @Router /users [delete]
 func DeleteAll(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	collection.DeleteMany(ctx, bson.M{})
+	_, err := collection.DeleteMany(ctx, bson.M{})
+	if err != nil {
+		core.Error(c, "Can't delete all users!", err)
+		return
+	}
+
+	core.Success(c, gin.H{
+		"message": "All Users delete successfully",
+	})
+}
+
+// DeleteUser godoc
+// @Summary Delete an user by ID
+// @ID delete-user
+// @Accept  json
+// @Produce  json
+// @Param Authorization header string true "Bearer ..."
+// @Param q query string false "id"
+// @Success 200 {object} models.DeleteResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401
+// @Router /users/{id} [delete]
+func DeleteUser(c *gin.Context) {
+	id := c.Query("id")
+	parsedID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		core.Error(c, "Invalid ID!", err)
+		return
+	}
+	var user models.User
+	filter := bson.D{{Key: "_id", Value: parsedID}}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	err = collection.FindOneAndDelete(ctx, filter).Decode(&user)
+	if err != nil {
+		core.Error(c, "No user fonded!", err)
+		return
+	}
+
+	core.Success(c, gin.H{
+		"message": fmt.Sprintf("User %v delete successfully", id),
+	})
 }
 
 func SetCollection(c *mongo.Collection) {
